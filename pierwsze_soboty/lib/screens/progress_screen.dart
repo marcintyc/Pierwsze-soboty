@@ -36,6 +36,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final now = DateTime.now();
     final year = now.year;
     final dates = _firstSaturdaysOfYear(year);
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Kalendarz i postęp')),
@@ -43,14 +44,24 @@ class _ProgressScreenState extends State<ProgressScreen> {
         future: _completedFuture,
         builder: (context, snapshot) {
           final completed = snapshot.data ?? <String>{};
-          final completedCount = completed.length;
-          final progressCount = completedCount > 5 ? 5 : completedCount;
+          final completedCount = completed.length > 5 ? 5 : completed.length;
+          final progress = completedCount / 5.0;
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text('Ukończono $progressCount/5 sobót', style: Theme.of(context).textTheme.titleMedium),
+              Text('Ukończono $completedCount/5 sobót', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
-              _ProgressHearts(count: progressCount),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 10,
+                  backgroundColor: Colors.grey.shade200,
+                  color: colors.secondary,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _ProgressHearts(count: completedCount, colors: colors),
               const SizedBox(height: 16),
               Text('Pierwsze soboty $year', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
@@ -81,15 +92,16 @@ class _SaturdayTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final df = DateFormat('d MMMM y', 'pl');
+    final colors = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
         leading: Icon(
-          completed ? Icons.favorite : Icons.favorite_border,
-          color: completed ? Colors.pinkAccent : Theme.of(context).colorScheme.primary,
+          completed ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          color: completed ? colors.secondary : colors.primary,
         ),
         title: Text(df.format(date)),
-        trailing: Switch(
+        trailing: Switch.adaptive(
           value: completed,
           onChanged: (v) => onChanged(v),
         ),
@@ -100,7 +112,8 @@ class _SaturdayTile extends StatelessWidget {
 
 class _ProgressHearts extends StatelessWidget {
   final int count;
-  const _ProgressHearts({required this.count});
+  final ColorScheme colors;
+  const _ProgressHearts({required this.count, required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +123,9 @@ class _ProgressHearts extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(right: 6),
           child: Icon(
-            filled ? Icons.favorite : Icons.favorite_border,
-            color: filled ? Colors.pinkAccent : Theme.of(context).colorScheme.primary,
-            size: 28,
+            filled ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            color: filled ? colors.secondary : colors.primary,
+            size: 26,
           ),
         );
       }),

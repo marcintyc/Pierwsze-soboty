@@ -49,6 +49,7 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -63,12 +64,12 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
             (e) => Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
-                leading: Icon(_iconFor(e.key), color: Theme.of(context).colorScheme.primary),
+                leading: _IconBadge(icon: _iconFor(e.key), colors: colors),
                 title: Text(e.key),
-                trailing: Checkbox(
+                trailing: Switch.adaptive(
                   value: e.value,
                   onChanged: (v) async {
-                    setState(() => _done[e.key] = v ?? false);
+                    setState(() => _done[e.key] = v);
                     await _persist();
                   },
                 ),
@@ -83,13 +84,13 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.15),
+                  color: colors.tertiary.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.favorite, color: Colors.pinkAccent),
+                    Icon(Icons.favorite_rounded, color: Colors.pinkAccent),
                     SizedBox(width: 8),
                     Text('Wszystkie warunki spełnione!'),
                   ],
@@ -103,10 +104,10 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
   }
 
   IconData _iconFor(String key) {
-    if (key.startsWith('Spowiedź')) return Icons.church;
-    if (key.startsWith('Komunia')) return Icons.local_florist;
-    if (key.startsWith('Jedna część')) return Icons.brightness_5;
-    return Icons.favorite_border;
+    if (key.startsWith('Spowiedź')) return Icons.church_rounded;
+    if (key.startsWith('Komunia')) return Icons.blur_circular_rounded;
+    if (key.startsWith('Jedna część')) return Icons.menu_book_rounded;
+    return Icons.self_improvement_rounded;
   }
 
   DateTime _firstSaturdayOfCurrentMonth() {
@@ -116,5 +117,28 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
       d = d.add(const Duration(days: 1));
     }
     return DateTime(d.year, d.month, d.day);
+  }
+}
+
+class _IconBadge extends StatelessWidget {
+  final IconData icon;
+  final ColorScheme colors;
+  const _IconBadge({required this.icon, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [colors.primary, colors.primary.withOpacity(0.7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Icon(icon, color: Colors.white),
+    );
   }
 }
