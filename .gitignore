@@ -1,0 +1,12 @@
+# Ignore local Flutter SDK clone
+flutter/
+
+# Flutter build outputs
+pierwsze_soboty/build/
+
+# Misc
+.dart_tool/
+.packages
+.pub-cache/
+.idea/
+.vscode/
