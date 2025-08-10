@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' as math;
 import '../services/storage_service.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -13,11 +14,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
   final StorageService _storage = StorageService();
   late Future<Set<String>> _completedFuture;
   late Future<int> _fullDevotionsFuture;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _reload();
+    // Scroll after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) => _autoScrollToCurrent());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _reload() {
@@ -35,6 +45,35 @@ class _ProgressScreenState extends State<ProgressScreen> {
       dates.add(d);
     }
     return dates;
+  }
+
+  int _currentOrNextIndex(List<DateTime> dates) {
+    final now = DateTime.now();
+    for (int i = 0; i < dates.length; i++) {
+      final d = dates[i];
+      if (!DateTime(d.year, d.month, d.day).isBefore(DateTime(now.year, now.month, now.day))) {
+        return i;
+      }
+    }
+    return dates.length - 1;
+  }
+
+  void _autoScrollToCurrent() {
+    final now = DateTime.now();
+    final year = now.year;
+    final dates = _firstSaturdaysOfYear(year);
+    final idx = _currentOrNextIndex(dates);
+    final double approxItemHeight = 80.0;
+    final double desired = idx * approxItemHeight;
+    if (_scrollController.hasClients) {
+      final max = _scrollController.position.maxScrollExtent;
+      final double offset = math.min(max, desired);
+      _scrollController.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   Future<void> _onToggle(DateTime d, bool val) async {
@@ -70,6 +109,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             builder: (context, snapFull) {
               final full = snapFull.data ?? 0;
               return ListView(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(16),
                 children: [
                   Text('Ukończone nabożeństwa (pełne cykle): $full', style: Theme.of(context).textTheme.titleMedium),

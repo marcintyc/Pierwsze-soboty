@@ -6,6 +6,8 @@ import '../services/notifications_service.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  static const String _pixabayUrl = 'https://pixabay.com/get/gc035ced8adec1e2b87d2b0e81f4b9e6d2f5a5f5c6f0f2d7b1a4e8f3e4e8c7a74e8d9f9c5d3b7a1e2d3f7b9a1b2c3d4e5_1280.jpg';
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -19,20 +21,21 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Full-screen background image
-          Image.asset(
-            'assets/images/fatima.jpg',
+          // Full-screen background image (network with offline fallback)
+          Image.network(
+            _pixabayUrl,
             fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Image.asset('assets/images/fatima.jpg', fit: BoxFit.cover),
           ),
-          // Dark gradient overlay for readability
+          // Lighter gradient overlay for readability
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x80000000), // 50% black
-                  Color(0x99000000), // 60% black
+                  Color(0x4D000000), // ~30% black
+                  Color(0x80000000), // ~50% black
                 ],
               ),
             ),
