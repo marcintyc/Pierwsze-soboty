@@ -28,7 +28,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets: []
+  assets:
+    - assets/images/fatima.jpg
   # fonts:
   #   - family: Poppins
   #     fonts:

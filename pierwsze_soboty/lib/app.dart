@@ -4,6 +4,7 @@ import 'screens/home_screen.dart';
 import 'screens/conditions_screen.dart';
 import 'screens/progress_screen.dart';
 import 'screens/info_screen.dart';
+import 'screens/prayer_feed_screen.dart';
 
 class PierwszeSobotyApp extends StatelessWidget {
   const PierwszeSobotyApp({super.key});
@@ -89,6 +90,7 @@ class PierwszeSobotyApp extends StatelessWidget {
         '/conditions': (context) => const ConditionsScreen(),
         '/progress': (context) => const ProgressScreen(),
         '/info': (context) => const InfoScreen(),
+        '/prayer-feed': (context) => const PrayerFeedScreen(),
       },
     );
   }

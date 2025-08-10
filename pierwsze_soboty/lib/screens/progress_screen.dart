@@ -108,7 +108,7 @@ class _SaturdayTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           completed ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-          color: completed ? colors.secondary : colors.primary,
+          color: completed ? const Color(0xFFE53935) : colors.primary,
         ),
         title: Text(df.format(date)),
         trailing: Switch.adaptive(
@@ -134,7 +134,7 @@ class _ProgressHearts extends StatelessWidget {
           padding: const EdgeInsets.only(right: 6),
           child: Icon(
             filled ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-            color: filled ? colors.secondary : colors.primary,
+            color: filled ? const Color(0xFFE53935) : colors.primary,
             size: 26,
           ),
         );

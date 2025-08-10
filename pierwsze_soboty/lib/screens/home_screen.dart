@@ -13,6 +13,11 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _HeroBanner(colors: colors),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset('assets/images/fatima.jpg', fit: BoxFit.cover, height: 160),
+          ),
           const SizedBox(height: 16),
           _PrimaryButton(
             icon: Icons.favorite_rounded,
@@ -30,6 +35,12 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.info_outline_rounded,
             label: 'Informacje',
             onPressed: () => Navigator.pushNamed(context, '/info'),
+          ),
+          const SizedBox(height: 12),
+          _PrimaryButton(
+            icon: Icons.people_rounded,
+            label: 'Prośby o modlitwę (feed)',
+            onPressed: () => Navigator.pushNamed(context, '/prayer-feed'),
           ),
           const SizedBox(height: 12),
           _PrimaryButton(
