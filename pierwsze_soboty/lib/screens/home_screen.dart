@@ -62,7 +62,7 @@ class _HeroBanner extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             colors.primary,
-            colors.primary.withOpacity(0.85),
+            colors.primary.withValues(alpha: 0.85),
             const Color(0xFF3B82F6),
           ],
           begin: Alignment.topLeft,
@@ -78,7 +78,7 @@ class _HeroBanner extends StatelessWidget {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
             ),
             child: const Icon(Icons.favorite_rounded, color: Colors.white),
           ),

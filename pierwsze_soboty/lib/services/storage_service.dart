@@ -1,7 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
-  static const String _completedSaturdaysKey = 'completed_saturdays';
+  static const String _completedSaturdaysKey = 'completed_saturdays'; // current cycle
+  static const String _fullDevotionsCountKey = 'full_devotions_count';
   static const String _conditionsPrefix = 'conditions_';
 
   Future<SharedPreferences> get _prefs async => SharedPreferences.getInstance();
@@ -40,13 +41,6 @@ class StorageService {
     return list.toSet();
   }
 
-  Future<void> markSaturdayCompleted(DateTime date) async {
-    final prefs = await _prefs;
-    final set = await loadCompletedSaturdays();
-    set.add(_dateKey(date));
-    await prefs.setStringList(_completedSaturdaysKey, set.toList());
-  }
-
   Future<void> toggleSaturdayCompletion(DateTime date, bool completed) async {
     final prefs = await _prefs;
     final set = await loadCompletedSaturdays();
@@ -61,6 +55,19 @@ class StorageService {
 
   bool isSaturdayCompletedSync(Set<String> completedSet, DateTime date) {
     return completedSet.contains(_dateKey(date));
+  }
+
+  // Full devotions (5 Saturdays) counter
+  Future<int> loadFullDevotionsCount() async {
+    final prefs = await _prefs;
+    return prefs.getInt(_fullDevotionsCountKey) ?? 0;
+  }
+
+  Future<void> incrementFullDevotionsAndResetCycle() async {
+    final prefs = await _prefs;
+    final current = prefs.getInt(_fullDevotionsCountKey) ?? 0;
+    await prefs.setInt(_fullDevotionsCountKey, current + 1);
+    await prefs.setStringList(_completedSaturdaysKey, <String>[]);
   }
 
   String _dateKey(DateTime date) {

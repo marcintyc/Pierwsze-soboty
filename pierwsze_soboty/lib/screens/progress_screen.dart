@@ -12,11 +12,17 @@ class ProgressScreen extends StatefulWidget {
 class _ProgressScreenState extends State<ProgressScreen> {
   final StorageService _storage = StorageService();
   late Future<Set<String>> _completedFuture;
+  late Future<int> _fullDevotionsFuture;
 
   @override
   void initState() {
     super.initState();
+    _reload();
+  }
+
+  void _reload() {
     _completedFuture = _storage.loadCompletedSaturdays();
+    _fullDevotionsFuture = _storage.loadFullDevotionsCount();
   }
 
   List<DateTime> _firstSaturdaysOfYear(int year) {
@@ -31,6 +37,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return dates;
   }
 
+  Future<void> _onToggle(DateTime d, bool val) async {
+    await _storage.toggleSaturdayCompletion(d, val);
+    final set = await _storage.loadCompletedSaturdays();
+    if (set.length >= 5) {
+      await _storage.incrementFullDevotionsAndResetCycle();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ukończono pełny cykl 5 sobót! Rozpoczynamy nowy.')),
+        );
+      }
+    }
+    setState(_reload);
+  }
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -42,40 +62,30 @@ class _ProgressScreenState extends State<ProgressScreen> {
       appBar: AppBar(title: const Text('Kalendarz i postęp')),
       body: FutureBuilder<Set<String>>(
         future: _completedFuture,
-        builder: (context, snapshot) {
-          final completed = snapshot.data ?? <String>{};
-          final completedCount = completed.length > 5 ? 5 : completed.length;
-          final progress = completedCount / 5.0;
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text('Ukończono $completedCount/5 sobót', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 10,
-                  backgroundColor: Colors.grey.shade200,
-                  color: colors.secondary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              _ProgressHearts(count: completedCount, colors: colors),
-              const SizedBox(height: 16),
-              Text('Pierwsze soboty $year', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 8),
-              ...dates.map((d) => _SaturdayTile(
-                    date: d,
-                    completed: _storage.isSaturdayCompletedSync(completed, d),
-                    onChanged: (val) async {
-                      await _storage.toggleSaturdayCompletion(d, val);
-                      setState(() {
-                        _completedFuture = _storage.loadCompletedSaturdays();
-                      });
-                    },
-                  )),
-            ],
+        builder: (context, snapCompleted) {
+          final completed = snapCompleted.data ?? <String>{};
+          final count = completed.length > 5 ? 5 : completed.length;
+          return FutureBuilder<int>(
+            future: _fullDevotionsFuture,
+            builder: (context, snapFull) {
+              final full = snapFull.data ?? 0;
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Text('Ukończone nabożeństwa (pełne cykle): $full', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  _ProgressHearts(count: count, colors: colors),
+                  const SizedBox(height: 16),
+                  Text('Pierwsze soboty $year', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  ...dates.map((d) => _SaturdayTile(
+                        date: d,
+                        completed: _storage.isSaturdayCompletedSync(completed, d),
+                        onChanged: (val) => _onToggle(d, val),
+                      )),
+                ],
+              );
+            },
           );
         },
       ),

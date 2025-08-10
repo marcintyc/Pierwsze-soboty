@@ -25,7 +25,7 @@ class PierwszeSobotyApp extends StatelessWidget {
       secondary: marianGold,
       tertiary: marianPink,
       surface: marianSurface,
-      background: marianSurface,
+      // background removed (deprecated in newer Flutter); using surface
       onPrimary: Colors.white,
       onSecondary: Colors.black,
     );
@@ -49,7 +49,7 @@ class PierwszeSobotyApp extends StatelessWidget {
       cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 3,
-        shadowColor: marianBlue.withOpacity(0.06),
+        shadowColor: marianBlue.withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -68,7 +68,7 @@ class PierwszeSobotyApp extends StatelessWidget {
         thumbColor: WidgetStateProperty.resolveWith((states) =>
             states.contains(WidgetState.selected) ? marianGold : Colors.white),
         trackColor: WidgetStateProperty.resolveWith((states) =>
-            states.contains(WidgetState.selected) ? marianBlueLight.withOpacity(0.6) : Colors.grey.shade300),
+            states.contains(WidgetState.selected) ? marianBlueLight.withValues(alpha: 0.6) : Colors.grey.shade300),
       ),
     );
 

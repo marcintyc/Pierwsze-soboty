@@ -41,7 +41,14 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
   Future<void> _persist() async {
     await _storage.saveConditionsFor(_currentSaturday, _done);
     if (_allDone()) {
-      await _storage.markSaturdayCompleted(_currentSaturday);
+      await _storage.toggleSaturdayCompletion(_currentSaturday, true);
+      final completed = await _storage.loadCompletedSaturdays();
+      if (completed.length >= 5 && mounted) {
+        await _storage.incrementFullDevotionsAndResetCycle();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ukończono pełny cykl 5 sobót! Rozpoczynamy nowy.')),
+        );
+      }
     }
   }
 
@@ -87,9 +94,9 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
                   color: colors.tertiary.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
+                  children: [
                     Icon(Icons.favorite_rounded, color: Colors.pinkAccent),
                     SizedBox(width: 8),
                     Text('Wszystkie warunki spełnione!'),
